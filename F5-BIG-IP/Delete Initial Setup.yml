@@ -1,0 +1,65 @@
+---
+- name: BIG-IP SETUP
+  hosts: f5_v14
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+  - name: Set the DNS settings on the BIG-IP
+    bigip_device_dns:
+      name_servers: "{{name_servers}}"
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: absent
+
+  - name: Set NTP server
+    bigip_device_ntp:
+      ntp_servers: "{{ntp_servers}}"
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: absent
+
+  - name: Set timezone
+    bigip_device_ntp:
+      timezone: America/Mexico_City
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: absent
+
+  - name: DELETE VIRTUAL SERVER
+    bigip_virtual_server:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http-virtualserver"
+      state: absent
+      validate_certs: "no"
+
+  - name: DELETE POOL
+    bigip_pool:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http_pool"
+      state: absent
+      validate_certs: "no"
+
+  - name: DELETE NODES
+    bigip_node:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "{{hostvars[item].name}}"
+      state: absent
+      validate_certs: "no"
+    loop: "{{ groups['webservers'] }}"

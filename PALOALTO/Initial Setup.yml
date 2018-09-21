@@ -1,0 +1,5 @@
+---
+- name: Initial Setup
+  hosts: Palo_Alto
+  connection: local
+  gather_facts: no

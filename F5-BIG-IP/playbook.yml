@@ -1,0 +1,22 @@
+---
+- name: GRAB F5 FACTS
+  hosts: f5_v14
+  connection: local
+  gather_facts: no
+  #roles: 
+  #  - F5-BIG-IQ
+
+  tasks:
+
+    - name: COLLECT BIG-IP FACTS
+      bigip_facts:
+        include: system_info
+        server: "{{private_ip}}"
+        user: "{{ansible_user}}"
+        password: "{{ansible_ssh_pass}}"
+        server_port: 443
+      register: bigip_facts
+
+    - name: COMPLETE BIG-IP SYSTEM INFORMATION
+      debug:
+        var: bigip_facts
