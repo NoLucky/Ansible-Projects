@@ -1,6 +1,6 @@
 ---
 - name: Initial Setup
-  hosts: Palo_Alto
+  hosts: 172.16.10.31
   connection: local
   gather_facts: false
 
@@ -8,7 +8,7 @@
 
   - name: Set DNS
     panos_mgtconfig:
-      #ip_address: "{{private_ip}}"
+      ip_address: "{{private_ip}}"
       username: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       dns_server_primary: "{{dns_server_primary}}"
@@ -18,7 +18,7 @@
     panos_interface:
       username: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
-      #ip_address: "{{private_ip}}"
+      ip_address: "{{private_ip}}"
       ip: "{{interface_ip}}"
       if_name: "ethernet1/1"
       zone_name: "{{zone}}"
