@@ -3,3 +3,21 @@
   hosts: Palo_Alto
   connection: local
   gather_facts: no
+
+  tasks:
+
+  - name: Set dns
+  panos_mgtconfig:
+    username: "{{ansible_user}}"
+    password: "{{ansible_ssh_pass}}"
+    ip_address: "{{private_ip}}"
+    dns_server_primary: "{{dns_server_primary}}"
+    dns_server_secondary: "{{dns_server_secondary}}"
+
+#  - name: Configure Interface
+#  interface:
+#    username: "{{ansible_user}}"
+#    password: "{{ansible_ssh_pass}}"
+#    ip_address: "{{private_ip}}"
+#    if_name: "ethernet1/1"
+#    zone_name: "public"
