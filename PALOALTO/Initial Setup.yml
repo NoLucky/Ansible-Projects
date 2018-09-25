@@ -6,13 +6,13 @@
 
   tasks:
 
-  - name: Set dns
-  panos_mgtconfig:
-    username: "{{ansible_user}}"
-    password: "{{ansible_ssh_pass}}"
-    ip_address: "{{private_ip}}"
-    dns_server_primary: "{{dns_server_primary}}"
-    dns_server_secondary: "{{dns_server_secondary}}"
+  - name: Set DNS
+    panos_mgtconfig:
+      username: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      ip_address: "{{private_ip}}"
+      dns_server_primary: "{{dns_server_primary}}"
+      dns_server_secondary: "{{dns_server_secondary}}"
 
 #  - name: Configure Interface
 #  interface:
