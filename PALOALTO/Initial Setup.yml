@@ -8,18 +8,19 @@
 
   - name: Set DNS
     panos_mgtconfig:
+      ip_address: "{{private_ip}}"
       username: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
-      ip_address: "{{private_ip}}"
       dns_server_primary: "{{dns_server_primary}}"
       dns_server_secondary: "{{dns_server_secondary}}"
 
-#  - name: Configure Interface
-#  interface:
-#    username: "{{ansible_user}}"
-#    password: "{{ansible_ssh_pass}}"
-#    ip_address: "{{private_ip}}"
-#    if_name: "ethernet1/1"
-#    zone_name: "public"
+  - name: Configure Interface
+    panos_interface:
+      username: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      ip_address: "{{private_ip}}"
+      ip: "{{interface_ip}}"
+      if_name: "ethernet1/1"
+      zone_name: "{{zone}}"
 
 #https://github.com/PaloAltoNetworks/ansible-pan/blob/master/examples/fw_interface.yml
