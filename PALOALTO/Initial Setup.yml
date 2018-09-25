@@ -2,7 +2,7 @@
 - name: Initial Setup
   hosts: Palo_Alto
   connection: local
-  gather_facts: no
+  gather_facts: false
 
   tasks:
 
@@ -21,3 +21,5 @@
 #    ip_address: "{{private_ip}}"
 #    if_name: "ethernet1/1"
 #    zone_name: "public"
+
+#https://github.com/PaloAltoNetworks/ansible-pan/blob/master/examples/fw_interface.yml
