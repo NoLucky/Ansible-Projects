@@ -9,15 +9,13 @@
   - name: Set DNS
     panos_mgtconfig:
       ip_address: "{{private_ip}}"
-      username: "{{ansible_user}}"
-      password: "{{ansible_ssh_pass}}"
+      api_key: "{{api_key}}"
       dns_server_primary: "{{dns_server_primary}}"
       dns_server_secondary: "{{dns_server_secondary}}"
 
   - name: Configure Interface
     panos_interface:
-      username: "{{ansible_user}}"
-      password: "{{ansible_ssh_pass}}"
+      api_key: "{{api_key}}"
       ip_address: "{{private_ip}}"
       ip: "{{interface_ip}}"
       if_name: "ethernet1/1"
