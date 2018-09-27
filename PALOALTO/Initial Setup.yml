@@ -1,6 +1,6 @@
 ---
 - name: Initial Setup
-  hosts: 172.16.10.31
+  hosts: Palo_Alto
   connection: local
   gather_facts: false
 
