@@ -9,7 +9,7 @@
   - name: Set the DNS settings on the BIG-IP-1
     bigip_device_dns:
       name_servers: "{{name_servers}}"
-      server: "{{item}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       validate_certs: no
@@ -18,7 +18,7 @@
   - name: Set NTP server-1
     bigip_device_ntp:
       ntp_servers: "{{ntp_servers}}"
-      server: "{{item}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       validate_certs: no
@@ -27,7 +27,7 @@
   - name: Set timezone-1
     bigip_device_ntp:
       timezone: America/Mexico_City
-      server: "{{item}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       validate_certs: no
@@ -35,7 +35,7 @@
 
   - name: CREATE NODES - F5-1
     bigip_node:
-      server: "{{item}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       server_port: "443"
@@ -47,7 +47,7 @@
 
   - name: CREATE POOL-1
     bigip_pool:
-      server: "{{item}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       server_port: "443"
@@ -59,7 +59,7 @@
 
   - name: ADD POOL MEMBERS F5-1
     bigip_pool_member:
-      server: "{{item}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       server_port: "443"
@@ -73,7 +73,7 @@
 
   - name: ADD VIRTUAL SERVER-1
     bigip_virtual_server:
-      server: "{{f5_1_ip}}"
+      server: "{{f5_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       server_port: "443"
@@ -85,20 +85,3 @@
       pool: "http_pool"
       snat: "Automap"
       validate_certs: "no"
-
-  - name: ADD VIRTUAL SERVER-3
-    bigip_virtual_server:
-      server: "{{f5_3_ip}}"
-      user: "{{ansible_user}}"
-      password: "{{ansible_ssh_pass}}"
-      server_port: "443"
-      name: "http-virtualserver"
-      destination: "{{f5_1_http_ip}}"
-      port: "80"
-      enabled_vlans: "all"
-      all_profiles: ['http','clientssl','oneconnect']
-      pool: "http_pool"
-      snat: "Automap"
-      validate_certs: "no"
-
-
