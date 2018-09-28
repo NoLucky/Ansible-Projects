@@ -51,7 +51,7 @@
       validate_certs: no
       state: present
 
-    - name: Set timezone-3
+  - name: Set timezone-3
     bigip_device_ntp:
       timezone: America/Mexico_City
       server: "{{f5_3_ip}}"
