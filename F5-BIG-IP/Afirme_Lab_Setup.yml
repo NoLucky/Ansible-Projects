@@ -150,7 +150,7 @@
       snat: "Automap"
       validate_certs: "no"
 
-    - name: ADD VIRTUAL SERVER-3
+  - name: ADD VIRTUAL SERVER-3
     bigip_virtual_server:
       server: "{{f5_3_ip}}"
       user: "{{ansible_user}}"
