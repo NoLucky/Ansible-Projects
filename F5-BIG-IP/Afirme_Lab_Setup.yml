@@ -36,7 +36,7 @@
       state: present
     with_items: "{{f5_ip}}"
 
-  - name: CREATE NODES
+  - name: CREATE NODES - F5-1
     bigip_node:
       server: "{{item}}"
       user: "{{ansible_user}}"
@@ -46,7 +46,17 @@
       name: "{{hostvars[item].name}}"
       validate_certs: "no"
     loop: "{{groups['webservers']}}"
-    with_items: "{{f5_ip}}"
+
+  - name: CREATE NODES - F5-3
+    bigip_node:
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      host: "{{item}}"
+      name: "{{hostvars[item].name}}"
+      validate_certs: "no"
+    loop: "{{groups['webservers']}}"
 
   - name: CREATE POOL
     bigip_pool:
@@ -61,7 +71,7 @@
       validate_certs: "no"
     with_items: "{{f5_ip}}"
 
-  - name: ADD POOL MEMBERS
+  - name: ADD POOL MEMBERS F5-1
     bigip_pool_member:
       server: "{{item}}"
       user: "{{ansible_user}}"
@@ -74,7 +84,21 @@
       pool: "http_pool"
       validate_certs: "no"
     loop: "{{groups['webservers']}}"
-    with_items: "{{f5_ip}}"
+
+  - name: ADD POOL MEMBERS F5-3
+    bigip_pool_member:
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      state: present
+      host: "{{item}}"
+      name: "{{hostvars[item].name}}"
+      port: "80"
+      pool: "http_pool"
+      validate_certs: "no"
+    loop: "{{groups['webservers']}}"
+    
 
   - name: ADD VIRTUAL SERVER
     bigip_virtual_server:
