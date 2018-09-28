@@ -6,35 +6,59 @@
   
   tasks:
 
-  - name: Set the DNS settings on the BIG-IP
+  - name: Set the DNS settings on the BIG-IP-1
     bigip_device_dns:
       name_servers: "{{name_servers}}"
-      server: "{{item}}"
+      server: "{{f5_1_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       validate_certs: no
       state: present
-    with_items: "{{f5_ip}}"
 
-  - name: Set NTP server
+  - name: Set the DNS settings on the BIG-IP-3
+    bigip_device_dns:
+      name_servers: "{{name_servers}}"
+      server: "{{f5_3_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+
+  - name: Set NTP server-1
     bigip_device_ntp:
       ntp_servers: "{{ntp_servers}}"
-      server: "{{item}}"
+      server: "{{f5_1_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       validate_certs: no
       state: present
-    with_items: "{{f5_ip}}"
 
-  - name: Set timezone
+  - name: Set NTP server-3
+    bigip_device_ntp:
+      ntp_servers: "{{ntp_servers}}"
+      server: "{{f5_3_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+
+  - name: Set timezone-1
     bigip_device_ntp:
       timezone: America/Mexico_City
-      server: "{{item}}"
+      server: "{{f5_1_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       validate_certs: no
       state: present
-    with_items: "{{f5_ip}}"
+
+    - name: Set timezone-3
+    bigip_device_ntp:
+      timezone: America/Mexico_City
+      server: "{{f5_3_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
 
   - name: CREATE NODES - F5-1
     bigip_node:
@@ -58,9 +82,9 @@
       validate_certs: "no"
     loop: "{{groups['webservers']}}"
 
-  - name: CREATE POOL
+  - name: CREATE POOL-1
     bigip_pool:
-      server: "{{item}}"
+      server: "{{f5_1_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       server_port: "443"
@@ -69,7 +93,18 @@
       monitors: "/Common/http"
       monitor_type: "and_list"
       validate_certs: "no"
-    with_items: "{{f5_ip}}"
+
+  - name: CREATE POOL-3
+    bigip_pool:
+      server: "{{f5_1_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http_pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+      validate_certs: "no"
 
   - name: ADD POOL MEMBERS F5-1
     bigip_pool_member:
@@ -100,18 +135,33 @@
     loop: "{{groups['webservers']}}"
     
 
-  - name: ADD VIRTUAL SERVER
+  - name: ADD VIRTUAL SERVER-1
     bigip_virtual_server:
-      server: "{{item}}"
+      server: "{{f5_1_ip}}"
       user: "{{ansible_user}}"
       password: "{{ansible_ssh_pass}}"
       server_port: "443"
       name: "http-virtualserver"
-      destination: "{{hostvars[item].http_server}}"
+      destination: "{{f5_1_http_ip}}"
       port: "80"
       enabled_vlans: "all"
       all_profiles: ['http','clientssl','oneconnect']
       pool: "http_pool"
       snat: "Automap"
       validate_certs: "no"
-    with_items: "{{f5_ip}}"
+
+    - name: ADD VIRTUAL SERVER-3
+    bigip_virtual_server:
+      server: "{{f5_3_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http-virtualserver"
+      destination: "{{f5_3_http_ip}}"
+      port: "80"
+      enabled_vlans: "all"
+      all_profiles: ['http','clientssl','oneconnect']
+      pool: "http_pool"
+      snat: "Automap"
+      validate_certs: "no"
+
