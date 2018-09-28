@@ -1,5 +1,5 @@
 ---
-- name: BIG-IP SETUP
+- name: AFIRME-LAB-SETUP
   hosts: AFIRME-LAB 
   connection: local
   gather_facts: false
