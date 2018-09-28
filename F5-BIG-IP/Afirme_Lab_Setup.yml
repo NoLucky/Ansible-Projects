@@ -1,0 +1,93 @@
+---
+- name: BIG-IP SETUP
+  hosts: AFIRME-LAB 
+  connection: local
+  gather_facts: false
+  
+  tasks:
+
+  - name: Set the DNS settings on the BIG-IP
+    bigip_device_dns:
+      name_servers: "{{name_servers}}"
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+    with_items: "{{f5_ip}}"
+
+  - name: Set NTP server
+    bigip_device_ntp:
+      ntp_servers: "{{ntp_servers}}"
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+    with_items: "{{f5_ip}}"
+
+  - name: Set timezone
+    bigip_device_ntp:
+      timezone: America/Mexico_City
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+    with_items: "{{f5_ip}}"
+
+  - name: CREATE NODES
+    bigip_node:
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      host: "{{item}}"
+      name: "{{hostvars[item].name}}"
+      validate_certs: "no"
+    loop: "{{groups['webservers']}}"
+    with_items: "{{f5_ip}}"
+
+  - name: CREATE POOL
+    bigip_pool:
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http_pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+      validate_certs: "no"
+    with_items: "{{f5_ip}}"
+
+  - name: ADD POOL MEMBERS
+    bigip_pool_member:
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      state: present
+      host: "{{item}}"
+      name: "{{hostvars[item].name}}"
+      port: "80"
+      pool: "http_pool"
+      validate_certs: "no"
+    loop: "{{groups['webservers']}}"
+    with_items: "{{f5_ip}}"
+
+  - name: ADD VIRTUAL SERVER
+    bigip_virtual_server:
+      server: "{{item}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http-virtualserver"
+      destination: "{{hostvars[item].http_server}}"
+      port: "80"
+      enabled_vlans: "all"
+      all_profiles: ['http','clientssl','oneconnect']
+      pool: "http_pool"
+      snat: "Automap"
+      validate_certs: "no"
+    with_items: "{{f5_ip}}"
