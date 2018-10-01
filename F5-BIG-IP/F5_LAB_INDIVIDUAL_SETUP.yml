@@ -1,6 +1,6 @@
 ---
 - name: F5-BIG-IP-LAB-SETUP
-  hosts: AFIRME-LAB 
+  hosts: F5-LAB
   connection: local
   gather_facts: false
   
