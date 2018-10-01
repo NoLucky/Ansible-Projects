@@ -1,3 +1,19 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 - name: AFIRME-LAB-SETUP
   hosts: AFIRME-LAB 
@@ -5,24 +21,6 @@
   gather_facts: false
   
   tasks:
-
-  - name: Set the DNS settings on the BIG-IP-1
-    bigip_device_dns:
-      name_servers: "{{name_servers}}"
-      server: "{{f5_1_ip}}"
-      user: "{{ansible_user}}"
-      password: "{{ansible_ssh_pass}}"
-      validate_certs: no
-      state: present
-
-  - name: Set the DNS settings on the BIG-IP-3
-    bigip_device_dns:
-      name_servers: "{{name_servers}}"
-      server: "{{f5_3_ip}}"
-      user: "{{ansible_user}}"
-      password: "{{ansible_ssh_pass}}"
-      validate_certs: no
-      state: present
 
   - name: Set NTP server-1
     bigip_device_ntp:
@@ -164,20 +162,4 @@
       pool: "http_pool"
       snat: "Automap"
       validate_certs: "no"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

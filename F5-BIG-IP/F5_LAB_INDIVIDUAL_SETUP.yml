@@ -1,0 +1,151 @@
+---
+- name: F5-BIG-IP-LAB-SETUP
+  hosts: AFIRME-LAB 
+  connection: local
+  gather_facts: false
+  
+  tasks:
+
+  - name: License BIG-IP using a key
+    bigip_device_license:
+      accept_eula: yes
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      license_key: "XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX"
+
+  - name: Provision LTM at "nominal" level
+    bigip_provision:
+      server: "{{f5}}"
+      module: ltm
+      level: nominal
+      password: "{{ansible_ssh_pass}}"
+      user: "{{ansible_user}}"
+      validate_certs: no
+
+  - name: Provision ASM at "nominal" level
+    bigip_provision:
+      server: "{{f5}}"
+      module: asm
+      level: nominal
+      password: "{{ansible_ssh_pass}}"
+      user: "{{ansible_user}}"
+      validate_certs: no
+
+#https://docs.ansible.com/ansible/latest/modules/bigip_provision_module.html#bigip-provision-module
+
+  - name: Add VLAN 30 as untagged to interface 1.1
+    bigip_vlan:
+      untagged_interface: "{{internal_interface}}"
+      name: "Interna"
+      password: "{{ansible_ssh_pass}}"
+      server: "{{f5}}"
+      tag: "{{internal_vlan}}"
+      user: "{{ansible_user}}"
+      validate_certs: "no"
+
+  - name: Add VLAN 20 as untagged to interface 1.2
+    bigip_vlan:
+      untagged_interface: {{external_interface}}
+      name: "Externa"
+      password: "{{ansible_ssh_pass}}"
+      server: "{{f5}}"
+      tag: "{{external_vlan}}"
+      user: "{{ansible_user}}"
+      validate_certs: "no"
+
+#https://docs.ansible.com/ansible/latest/modules/bigip_vlan_module.html#bigip-vlan-module
+
+  - name: Create Self IP for Internal Network
+    bigip_selfip:
+      address: "{{internal_ip}}"
+      name: Interno
+      netmask: "{{internal_mask}}"
+      password: "{{ansible_ssh_pass}}"
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      validate_certs: no
+      vlan: "{{internal_vlan}}"
+
+  - name: Create Self IP for External Network
+    bigip_selfip:
+      address: "{{external_ip}}"
+      name: Externo
+      netmask: "{{external_mask}}"
+      password: "{{ansible_ssh_pass}}"
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      validate_certs: no
+      vlan: "{{external_vlan}}"
+
+#https://docs.ansible.com/ansible/latest/modules/bigip_selfip_module.html#bigip-selfip-module
+
+  - name: Set NTP server
+    bigip_device_ntp:
+      ntp_servers: "{{ntp_servers}}"
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+
+  - name: Set Timezone
+    bigip_device_ntp:
+      timezone: America/Mexico_City
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      validate_certs: no
+      state: present
+
+  - name: CREATE NODES
+    bigip_node:
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      host: "{{item}}"
+      name: "{{hostvars[item].name}}"
+      validate_certs: "no"
+    loop: "{{groups['webservers']}}"
+
+  - name: CREATE POOL
+    bigip_pool:
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http_pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+      validate_certs: "no"
+
+  - name: ADD POOL MEMBERS
+    bigip_pool_member:
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      state: present
+      host: "{{item}}"
+      name: "{{hostvars[item].name}}"
+      port: "80"
+      pool: "http_pool"
+      validate_certs: "no"
+    loop: "{{groups['webservers']}}"
+    
+  - name: ADD VIRTUAL SERVER
+    bigip_virtual_server:
+      server: "{{f5}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "443"
+      name: "http-virtualserver"
+      destination: "{{f5_virtualserver}}"
+      port: "80"
+      enabled_vlans: "all"
+      all_profiles: ['http','clientssl','oneconnect']
+      pool: "http_pool"
+      snat: "Automap"
+      validate_certs: "no"
