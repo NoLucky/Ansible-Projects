@@ -46,7 +46,7 @@
 
   - name: Add VLAN 20 as untagged to interface 1.2
     bigip_vlan:
-      untagged_interface: {{external_interface}}
+      untagged_interface: "{{external_interface}}"
       name: "Externa"
       password: "{{ansible_ssh_pass}}"
       server: "{{f5}}"
