@@ -3,6 +3,8 @@
   hosts: Palo_Alto
   connection: local
   gather_facts: false
+  environment:
+     GIT_SSL_NO_VERIFY: 'true'
 
   tasks:
 

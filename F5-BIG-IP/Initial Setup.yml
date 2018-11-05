@@ -3,6 +3,8 @@
   hosts: f5_v14
   connection: local
   gather_facts: false
+  environment:
+     GIT_SSL_NO_VERIFY: 'true'
   
   tasks:
 

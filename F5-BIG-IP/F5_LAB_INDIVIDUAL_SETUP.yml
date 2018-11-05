@@ -3,7 +3,9 @@
   hosts: F5-LAB
   connection: local
   gather_facts: false
-  
+  environment:
+     GIT_SSL_NO_VERIFY: 'true'
+     
   tasks:
 
 #  - name: License BIG-IP using a key
